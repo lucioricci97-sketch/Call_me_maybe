@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# Type checking / linters
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+
+# Project output (subject says: do not commit)
+data/output/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
