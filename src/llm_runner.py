@@ -55,7 +55,7 @@ class Vocab:
         self.size = llm.vocab_size()
         self.id_to_text: dict[int, str] = {i: llm.decode([i]) for i in range(self.size)}
 
-    def tokens_where(self, predicate: Callable[[str], bool]) -> set[int]:
+    def tokens_allowed(self, predicate: Callable[[str], bool]) -> set[int]:
         """Token ids whose decoded text satisfies `predicate`."""
         return {i for i, txt in self.id_to_text.items() if predicate(txt)}
 
@@ -128,7 +128,7 @@ def generate_number(
 ) -> float | int:
     """Constrained decoding: emit only digit/[-]/[.] tokens until model leaves number-land."""
     chars = set("0123456789-") | ({"."} if not is_integer else set())
-    number_tokens = vocab.tokens_where(
+    number_tokens = vocab.tokens_allowed(
         lambda t: bool(t.strip()) and all(c in chars for c in t.strip())
     )
 
@@ -156,7 +156,7 @@ def _generate_string_free(
     llm: LLM, vocab: Vocab, context_ids: list[int], *, max_tokens: int
 ) -> str:
     """Free generation; stop once a newline appears in the decoded output."""
-    content_tokens = vocab.tokens_where(lambda t: bool(t))
+    content_tokens = vocab.tokens_allowed(lambda t: bool(t))
     out: list[int] = []
     prefix = list(context_ids)
     for _ in range(max_tokens):
@@ -186,7 +186,7 @@ def _generate_string_from_prompt(
     candidates = [
         (tid, txt) for tid, txt in vocab.id_to_text.items() if txt and txt in user_prompt
     ]
-    stop_tokens = vocab.tokens_where(lambda t: "\n" in t)
+    stop_tokens = vocab.tokens_allowed(lambda t: "\n" in t)
     out: list[int] = []
     prefix = list(context_ids)
     decoded = ""

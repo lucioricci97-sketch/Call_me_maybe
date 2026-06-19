@@ -1,3 +1,10 @@
+
+export HF_HOME=$(HOME)/sgoinfre
+export UV_CACHE_DIR=$(HOME)/sgoinfre/uv_cache
+# $(HOME)/sgoinfre/.uv_cache
+export UV_PROJECT_ENVIRONMENT := $(HOME)/sgoinfre/venv
+unexport VIRTUAL_ENV
+
 .PHONY: install run debug clean lint lint-strict
 
 install:

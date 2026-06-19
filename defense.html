@@ -1,0 +1,1204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Call Me Maybe — Defense Trainer</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --bg-elev: #181b24;
+    --bg-card: #1f2330;
+    --border: #2a2f3e;
+    --text: #e8eaf0;
+    --text-dim: #9aa0b4;
+    --accent: #7c5cff;
+    --accent-soft: #7c5cff20;
+    --green: #4ade80;
+    --red: #f87171;
+    --yellow: #fbbf24;
+    --code-bg: #0a0c12;
+    --kbd: #2a2f3e;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.65;
+    font-size: 16px;
+  }
+  /* Layout */
+  .layout { display: grid; grid-template-columns: 260px 1fr; min-height: 100vh; }
+  nav.sidebar {
+    background: var(--bg-elev);
+    border-right: 1px solid var(--border);
+    padding: 24px 0;
+    position: sticky; top: 0; height: 100vh; overflow-y: auto;
+  }
+  nav.sidebar h1 {
+    font-size: 1.15rem; padding: 0 24px 16px; color: var(--text);
+    display: flex; align-items: center; gap: 8px;
+  }
+  nav.sidebar h1 .dot {
+    width: 10px; height: 10px; border-radius: 50%; background: var(--accent);
+    box-shadow: 0 0 12px var(--accent);
+  }
+  nav.sidebar .sub { padding: 0 24px 24px; color: var(--text-dim); font-size: 0.85rem; }
+  nav.sidebar a {
+    display: block; padding: 10px 24px; color: var(--text-dim);
+    text-decoration: none; border-left: 3px solid transparent; font-size: 0.95rem;
+    transition: all 0.15s;
+  }
+  nav.sidebar a:hover { color: var(--text); background: var(--bg-card); }
+  nav.sidebar a.active { color: var(--accent); border-left-color: var(--accent); background: var(--accent-soft); }
+  main { padding: 56px 64px; max-width: 980px; }
+  @media (max-width: 880px) {
+    .layout { grid-template-columns: 1fr; }
+    nav.sidebar { position: static; height: auto; }
+    main { padding: 32px 20px; }
+  }
+  section { margin-bottom: 80px; scroll-margin-top: 24px; }
+  section h2 {
+    font-size: 2rem; margin-bottom: 8px;
+    background: linear-gradient(120deg, var(--accent), #4cc9f0);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  section .lead { color: var(--text-dim); font-size: 1.05rem; margin-bottom: 28px; }
+  h3 { margin: 24px 0 12px; color: var(--text); font-size: 1.2rem; }
+  h4 { margin: 16px 0 8px; color: var(--text); font-size: 1.05rem; }
+  p { margin-bottom: 12px; }
+  /* Hero */
+  .hero {
+    background: linear-gradient(135deg, #1a1d2a 0%, #0f1117 60%);
+    border: 1px solid var(--border);
+    border-radius: 16px; padding: 40px;
+    margin-bottom: 56px;
+  }
+  .hero h1 {
+    font-size: 2.6rem; font-weight: 800;
+    background: linear-gradient(120deg, var(--accent), #4cc9f0, #f72585);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+    margin-bottom: 10px;
+  }
+  .hero p.tag { color: var(--text-dim); font-size: 1.1rem; margin-bottom: 20px; }
+  .hero .pitch { font-size: 1rem; color: var(--text); }
+  .hero kbd {
+    background: var(--kbd); padding: 2px 8px; border-radius: 4px;
+    font-family: ui-monospace, monospace; font-size: 0.88em; border: 1px solid var(--border);
+  }
+  /* Cards */
+  .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-bottom: 24px; }
+  .card {
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 20px;
+    transition: transform 0.15s, border-color 0.15s;
+  }
+  .card:hover { transform: translateY(-2px); border-color: var(--accent); }
+  .card h4 { margin-top: 0; color: var(--accent); }
+  .card .num {
+    display: inline-block; width: 28px; height: 28px; line-height: 28px;
+    background: var(--accent-soft); color: var(--accent); border-radius: 50%;
+    text-align: center; font-weight: 700; margin-right: 8px;
+  }
+  /* Code */
+  pre {
+    background: var(--code-bg); border: 1px solid var(--border);
+    border-radius: 10px; padding: 18px; overflow-x: auto;
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.88rem; line-height: 1.55; margin: 12px 0;
+  }
+  code {
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    background: var(--bg-card); padding: 1px 6px; border-radius: 4px;
+    font-size: 0.88em; color: #f0b3ff;
+  }
+  pre code { background: none; padding: 0; color: var(--text); font-size: inherit; }
+  .tok-key { color: #c792ea; }
+  .tok-str { color: #c3e88d; }
+  .tok-num { color: #f78c6c; }
+  .tok-com { color: #5f6477; font-style: italic; }
+  .tok-fn { color: #82aaff; }
+  /* Tabs */
+  .tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--border); margin-bottom: 0; flex-wrap: wrap; }
+  .tab {
+    padding: 10px 16px; background: none; border: none; color: var(--text-dim);
+    cursor: pointer; font-size: 0.95rem; font-family: inherit;
+    border-bottom: 2px solid transparent; transition: all 0.15s;
+  }
+  .tab:hover { color: var(--text); }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .tab-content { display: none; padding-top: 16px; }
+  .tab-content.active { display: block; }
+  /* Accordion / Q&A */
+  .qa-item {
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: 10px; margin-bottom: 10px; overflow: hidden;
+  }
+  .qa-q {
+    width: 100%; text-align: left; padding: 16px 20px; background: none;
+    border: none; color: var(--text); cursor: pointer; font-size: 0.98rem;
+    font-family: inherit; display: flex; justify-content: space-between; align-items: center;
+  }
+  .qa-q:hover { background: var(--bg-elev); }
+  .qa-q .icon { color: var(--accent); transition: transform 0.2s; flex-shrink: 0; margin-left: 12px; }
+  .qa-item.open .qa-q .icon { transform: rotate(45deg); }
+  .qa-a { display: none; padding: 0 20px 18px; color: var(--text-dim); border-top: 1px solid var(--border); }
+  .qa-item.open .qa-a { display: block; padding-top: 14px; }
+  /* Quiz */
+  .quiz-card {
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 24px; margin-bottom: 16px;
+  }
+  .quiz-q { font-size: 1.05rem; margin-bottom: 16px; font-weight: 500; }
+  .quiz-q .num { color: var(--accent); font-weight: 700; margin-right: 8px; }
+  .quiz-opt {
+    display: block; padding: 12px 16px; margin-bottom: 8px;
+    background: var(--bg-elev); border: 1px solid var(--border);
+    border-radius: 8px; cursor: pointer; transition: all 0.15s;
+    color: var(--text); font-family: inherit; width: 100%; text-align: left;
+    font-size: 0.95rem;
+  }
+  .quiz-opt:hover { border-color: var(--accent); }
+  .quiz-opt.correct { background: #4ade8020; border-color: var(--green); color: var(--green); }
+  .quiz-opt.wrong { background: #f8717120; border-color: var(--red); color: var(--red); }
+  .quiz-opt.reveal-correct { background: #4ade8010; border-color: var(--green); }
+  .quiz-opt:disabled { cursor: default; }
+  .quiz-explain {
+    margin-top: 12px; padding: 12px 16px;
+    background: var(--accent-soft); border-left: 3px solid var(--accent);
+    border-radius: 6px; font-size: 0.92rem; display: none;
+  }
+  .quiz-explain.show { display: block; }
+  .quiz-score {
+    position: sticky; top: 20px; background: var(--bg-card);
+    border: 2px solid var(--accent); border-radius: 12px; padding: 16px 20px;
+    text-align: center; margin-bottom: 24px; z-index: 10;
+  }
+  .quiz-score .pct {
+    font-size: 2rem; font-weight: 800; color: var(--accent);
+  }
+  /* Interactive demos */
+  .demo {
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 24px; margin: 16px 0;
+  }
+  .demo h4 { margin-top: 0; color: var(--accent); }
+  .tok-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin: 12px 0; }
+  .tok-chip {
+    background: var(--bg-elev); border: 1px solid var(--border);
+    padding: 8px 14px; border-radius: 8px; cursor: pointer;
+    font-family: ui-monospace, monospace; font-size: 0.88rem;
+    transition: all 0.15s; user-select: none;
+  }
+  .tok-chip:hover { border-color: var(--accent); }
+  .tok-chip.allowed { background: #4ade8020; border-color: var(--green); }
+  .tok-chip.forbidden { background: #f8717110; border-color: #f8717140; color: #999; text-decoration: line-through; }
+  .tok-chip.winner {
+    background: var(--accent-soft); border-color: var(--accent);
+    box-shadow: 0 0 16px var(--accent-soft);
+    transform: scale(1.08);
+  }
+  .logit-bar {
+    display: flex; align-items: center; gap: 10px; margin: 6px 0;
+    font-family: ui-monospace, monospace; font-size: 0.86rem;
+  }
+  .logit-bar .label { width: 80px; flex-shrink: 0; }
+  .logit-bar .bar {
+    height: 18px; background: var(--accent); border-radius: 4px;
+    transition: all 0.3s;
+  }
+  .logit-bar .val { color: var(--text-dim); width: 60px; text-align: right; }
+  .logit-bar.forbidden .bar { background: var(--red); opacity: 0.3; }
+  .logit-bar.forbidden .label { text-decoration: line-through; opacity: 0.5; }
+  .logit-bar.winner .bar { background: var(--green); }
+  .logit-bar.winner .label { color: var(--green); font-weight: 700; }
+  button.btn {
+    background: var(--accent); color: white; border: none; padding: 10px 18px;
+    border-radius: 8px; cursor: pointer; font-family: inherit;
+    font-size: 0.92rem; font-weight: 500; transition: all 0.15s;
+    margin-right: 8px;
+  }
+  button.btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px var(--accent-soft); }
+  button.btn.secondary { background: var(--bg-elev); border: 1px solid var(--border); color: var(--text); }
+  /* Concept reveal */
+  .concept {
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 24px; margin-bottom: 16px;
+  }
+  .concept .num-big {
+    display: inline-block; width: 36px; height: 36px; line-height: 36px;
+    background: linear-gradient(135deg, var(--accent), #4cc9f0);
+    color: white; border-radius: 50%; text-align: center; font-weight: 700;
+    margin-right: 12px;
+  }
+  .concept h3 { display: flex; align-items: center; margin-top: 0; }
+  .concept .analogy {
+    background: var(--bg-elev); padding: 12px 16px;
+    border-left: 3px solid var(--yellow); border-radius: 6px;
+    margin: 12px 0; font-size: 0.95rem;
+  }
+  .concept .analogy::before { content: "🔤  Analogy — "; color: var(--yellow); font-weight: 600; }
+  .concept .defense {
+    background: var(--bg-elev); padding: 12px 16px;
+    border-left: 3px solid var(--green); border-radius: 6px;
+    margin: 12px 0; font-size: 0.95rem;
+  }
+  .concept .defense::before { content: "🎤  Defense answer — "; color: var(--green); font-weight: 600; }
+  .concept .where {
+    background: var(--bg-elev); padding: 12px 16px;
+    border-left: 3px solid var(--accent); border-radius: 6px;
+    margin: 12px 0; font-size: 0.95rem;
+  }
+  .concept .where::before { content: "📁  In your code — "; color: var(--accent); font-weight: 600; }
+  /* Checklist */
+  .checklist .item {
+    display: flex; align-items: flex-start; padding: 12px 16px;
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: 8px; margin-bottom: 8px; cursor: pointer;
+    transition: all 0.15s;
+  }
+  .checklist .item:hover { border-color: var(--accent); }
+  .checklist .item.done {
+    background: #4ade8010; border-color: var(--green);
+  }
+  .checklist .item.done .text { color: var(--text-dim); text-decoration: line-through; }
+  .checklist .box {
+    width: 22px; height: 22px; border: 2px solid var(--text-dim);
+    border-radius: 4px; margin-right: 14px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s;
+  }
+  .checklist .item.done .box {
+    background: var(--green); border-color: var(--green);
+  }
+  .checklist .item.done .box::after {
+    content: "✓"; color: white; font-weight: 700;
+  }
+  .checklist .progress {
+    height: 8px; background: var(--bg-elev); border-radius: 4px;
+    overflow: hidden; margin-bottom: 16px;
+  }
+  .checklist .progress .fill {
+    height: 100%; background: linear-gradient(90deg, var(--accent), var(--green));
+    transition: width 0.3s; width: 0%;
+  }
+  /* Pill / badges */
+  .badge {
+    display: inline-block; padding: 2px 10px; border-radius: 12px;
+    font-size: 0.75rem; font-weight: 600; margin-right: 6px;
+  }
+  .badge.green { background: #4ade8030; color: var(--green); }
+  .badge.red { background: #f8717130; color: var(--red); }
+  .badge.yellow { background: #fbbf2430; color: var(--yellow); }
+  .badge.violet { background: var(--accent-soft); color: var(--accent); }
+  /* Risks */
+  .risk {
+    background: linear-gradient(135deg, #fbbf2410, #fbbf2405);
+    border: 1px solid #fbbf2440; border-radius: 12px;
+    padding: 20px; margin-bottom: 16px;
+  }
+  .risk h4 { color: var(--yellow); margin-top: 0; }
+  .footer {
+    text-align: center; color: var(--text-dim); padding: 40px 0; font-size: 0.88rem;
+    border-top: 1px solid var(--border); margin-top: 40px;
+  }
+  .mobile-toggle {
+    display: none; position: fixed; bottom: 24px; right: 24px; z-index: 100;
+    background: var(--accent); color: white; border: none; width: 56px; height: 56px;
+    border-radius: 50%; font-size: 1.5rem; cursor: pointer;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+  }
+  @media (max-width: 880px) {
+    .mobile-toggle { display: block; }
+    nav.sidebar { display: none; }
+    nav.sidebar.open { display: block; position: fixed; z-index: 99; width: 240px; }
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+
+<nav class="sidebar" id="sidebar">
+  <h1><span class="dot"></span> Call Me Maybe</h1>
+  <div class="sub">Defense Trainer · 42 Firenze</div>
+  <a href="#overview" class="active">🎯 Overview</a>
+  <a href="#concepts">🧠 The 8 Concepts</a>
+  <a href="#pydantic">🐍 Pydantic</a>
+  <a href="#files">📁 The Code</a>
+  <a href="#demo">🎮 Interactive Demo</a>
+  <a href="#risks">⚠️ Honest Risks</a>
+  <a href="#qa">🎤 Q&amp;A Bank</a>
+  <a href="#quiz">🎯 Quiz</a>
+  <a href="#checklist">✅ Checklist</a>
+</nav>
+
+<main>
+
+<!-- ========= HERO / OVERVIEW ========= -->
+<section id="overview">
+  <div class="hero">
+    <h1>Call Me Maybe</h1>
+    <p class="tag">Function calling in LLMs · constrained decoding · Qwen3-0.6B</p>
+    <p class="pitch">
+      <strong>One sentence:</strong> The program reads natural-language questions and writes back JSON saying
+      <em>which function to call and with what arguments</em> — never the answer itself. The hard part is making
+      a tiny 0.6B model produce reliable structured output. The technique that solves it is
+      <span class="badge violet">constrained decoding</span>: at every token step, mask any illegal token
+      with <code>−∞</code> so the model can only pick legal ones.
+    </p>
+    <p class="pitch" style="margin-top:12px">
+      <strong>The single most important insight:</strong> The JSON braces are never written by the model.
+      Python builds a dict and calls <code>json.dump</code>. The model only supplies <em>values</em>
+      (function name, numbers, strings). So <em>100% valid JSON is free</em>; constrained decoding makes the
+      <strong>values</strong> correctly typed.
+    </p>
+  </div>
+
+  <h3>What goes in and out</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>Input 1 — Catalog</h4>
+      <p style="color:var(--text-dim);font-size:0.92rem">
+        <code>data/input/functions_definition.json</code> lists every function the model may call
+        (name, description, parameter types, return type).
+      </p>
+    </div>
+    <div class="card">
+      <h4>Input 2 — Prompts</h4>
+      <p style="color:var(--text-dim);font-size:0.92rem">
+        <code>data/input/function_calling_tests.json</code> lists the natural-language prompts to process.
+      </p>
+    </div>
+    <div class="card">
+      <h4>Output</h4>
+      <p style="color:var(--text-dim);font-size:0.92rem">
+        <code>data/output/function_calling_results.json</code> — one entry per prompt
+        with <code>prompt</code>, <code>name</code>, <code>parameters</code>.
+      </p>
+    </div>
+  </div>
+
+  <h3>Rules at a glance</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>✅ Allowed</h4>
+      <p style="color:var(--text-dim);font-size:0.92rem">Python ≥ 3.10, <code>uv</code>, <code>pydantic</code>,
+      <code>numpy</code>, <code>json</code>, the provided <code>llm_sdk</code>.</p>
+    </div>
+    <div class="card">
+      <h4>❌ Forbidden</h4>
+      <p style="color:var(--text-dim);font-size:0.92rem"><code>torch</code>, <code>transformers</code>,
+      <code>dspy</code>, <code>outlines</code>; picking the function with <code>if "sum" in prompt</code>.</p>
+    </div>
+    <div class="card">
+      <h4>🎯 Pass bar</h4>
+      <p style="color:var(--text-dim);font-size:0.92rem">≥ 90% accuracy; 100% valid JSON; under 5 min on
+      CPU; never crashes; full <code>README.md</code>.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ========= THE 8 CONCEPTS ========= -->
+<section id="concepts">
+  <h2>🧠 The 8 Foundational Concepts</h2>
+  <p class="lead">These are <em>the</em> questions evaluators ask. Master them and you've passed the hardest part of the defense.</p>
+
+  <div class="concept">
+    <h3><span class="num-big">1</span>Tokens &amp; the vocabulary</h3>
+    <p>An LLM does <strong>not</strong> read words or letters. It reads <strong>tokens</strong> — small text chunks. <code>"hello"</code> → 1 token; <code>"fn_add_numbers"</code> → ~3 tokens; <code>"42.0"</code> → 4 tokens. Qwen3 has ~<strong>151,936</strong> tokens.</p>
+    <div class="analogy">A numbered LEGO catalog. Every brick has an ID. The model builds sentences only out of bricks from the catalog.</div>
+    <div class="where"><code>LLM.encode(text)</code> → list of IDs. <code>LLM.decode(ids)</code> → text. The <code>Vocab</code> class decodes every ID once at startup.</div>
+    <div class="defense">A token is a chunk of text — word, subword, character, or punctuation — that the tokenizer extracts via BPE. Each has a unique integer ID. Qwen3's vocabulary has about 152,000 tokens.</div>
+  </div>
+
+  <div class="concept">
+    <h3><span class="num-big">2</span>Generation is a loop, not a sum</h3>
+    <p>Most-misunderstood point. The model outputs scores for the next token; you pick one, <strong>append it</strong>, and ask again. That's generation:</p>
+    <pre><code><span class="tok-com"># Generation loop (this is what generate_number / generate_string do)</span>
+<span class="tok-key">for</span> _ <span class="tok-key">in</span> <span class="tok-fn">range</span>(max_tokens):
+    logits = llm.logits_after(prefix)       <span class="tok-com"># step 1</span>
+    best   = _argmax_in(logits, allowed)    <span class="tok-com"># step 2 (constrained)</span>
+    out.append(best)                        <span class="tok-com"># step 3</span>
+    prefix.append(best)                     <span class="tok-com"># step 4</span>
+    <span class="tok-key">if</span> stop_condition: <span class="tok-key">break</span>          <span class="tok-com"># step 5</span></code></pre>
+    <div class="analogy">Predictive text on your phone, but with 152k options and you control which one gets accepted.</div>
+    <div class="defense">Generation is a loop: feed prefix → get logits → argmax → append → repeat. Summing log-probs is a <em>different</em> operation — it's for <em>comparing fixed candidates</em> (like <code>'true'</code> vs <code>'false'</code>), not for generating new text.</div>
+  </div>
+
+  <div class="concept">
+    <h3><span class="num-big">3</span>Logits — raw scores</h3>
+    <p>The ~152k numbers the model outputs are called <strong>logits</strong>. They are <strong>raw and unnormalized</strong>, not probabilities. Typically range <strong>−15 to +25</strong>. Higher = more plausible. They do <em>not</em> sum to 1.</p>
+    <div class="analogy">Judges' raw scorecards before any conversion to percentages.</div>
+    <div class="defense">A logit is a raw, unnormalized score the model assigns to each vocabulary token as a candidate for the next position. It's not a probability. Higher = more plausible.</div>
+  </div>
+
+  <div class="concept">
+    <h3><span class="num-big">4</span>argmax vs max</h3>
+    <p><code>max(logits)</code> returns the highest <em>value</em>; <code>argmax(logits)</code> returns the <em>index</em>. We want the index because <strong>the index IS the token ID</strong>. Token ID 17 is "dog"; the number 7.5 is just a score.</p>
+    <p>Python has no built-in <code>argmax</code>. The idiom:</p>
+    <pre><code>top = <span class="tok-fn">max</span>(<span class="tok-fn">range</span>(<span class="tok-fn">len</span>(logits)), key=<span class="tok-key">lambda</span> i: logits[i])</code></pre>
+    <div class="analogy"><code>max</code> gives the <strong>prize</strong>; <code>argmax</code> gives the <strong>winner</strong>. We need the winner.</div>
+  </div>
+
+  <div class="concept">
+    <h3><span class="num-big">5</span>Softmax — and why you skip it</h3>
+    <p>Softmax turns logits into probabilities: <code>prob[i] = exp(logit[i]) / Σ exp(logit[j])</code>. Key property: <strong>it preserves order</strong>. So <code>argmax(logits) == argmax(softmax(logits))</code>. Your code never computes softmax when it just needs the winner.</p>
+    <div class="defense">Softmax converts logits into probabilities in [0,1] that sum to 1. I don't compute it because it preserves ordering — argmax on raw logits picks the same token.</div>
+  </div>
+
+  <div class="concept">
+    <h3><span class="num-big">6</span>Log-probabilities — and summing them</h3>
+    <p>To compare whole sequences (like <code>"true"</code> vs <code>"false"</code>) you need their probabilities. Multiplying many small probabilities <strong>underflows</strong>. Logs turn multiplication into <strong>addition</strong>:</p>
+    <pre><code>log P(sequence) = log P(t1) + log P(t2|t1) + log P(t3|t1,t2) + ...</code></pre>
+    <p>So you <strong>sum log-probs</strong> to score a candidate.</p>
+    <div class="defense">Sum of log-probs = log of the product of probabilities = <code>log P(sequence)</code> — the model's actual likelihood of generating that candidate. That's the quantity to maximize. Raw logits are unnormalized, so summing them biases toward long candidates; log-probs are normalized.</div>
+  </div>
+
+  <div class="concept">
+    <h3><span class="num-big">7</span>log-sum-exp — the safe denominator</h3>
+    <p><code>exp(700)</code> overflows to infinity. To compute <code>log(Σ exp(values))</code> safely:</p>
+    <pre><code>m = <span class="tok-fn">max</span>(values)
+<span class="tok-key">return</span> m + math.log(<span class="tok-fn">sum</span>(math.exp(v - m) <span class="tok-key">for</span> v <span class="tok-key">in</span> values))</code></pre>
+    <p>Subtract the max so the largest <code>exp</code> is <code>exp(0) = 1</code>; add it back at the end. Same result, no overflow.</p>
+    <div class="defense">Numerical stability trick. Without it, <code>exp</code> of a large logit can overflow. Subtracting a constant from every term and adding it back doesn't change the result.</div>
+  </div>
+
+  <div class="concept">
+    <h3><span class="num-big">8</span>Masking with −∞ — this IS constrained decoding</h3>
+    <p>Set illegal tokens' logits to <code>−∞</code>. Then <code>argmax</code> can never pick them, and after softmax their probability is <code>exp(−∞) = 0</code>. <strong>Why not 0?</strong> Because <code>0</code> is a perfectly normal logit value (many good tokens score near 0) — it wouldn't suppress an illegal token.</p>
+    <p>Your code does this cheaper: <code>_argmax_in(logits, allowed)</code> just searches the maximum among allowed IDs — mathematically identical to masking, without building a 152k-long array.</p>
+    <div class="analogy">A multiple-choice test where someone crosses out wrong answers before you choose — you <em>can't</em> pick them.</div>
+    <div class="defense">Three places I use it: function-name selection, number generation, and string Stage B (substring fallback). The primitive is <code>_argmax_in</code>; it's equivalent to setting other logits to −∞ and taking argmax, but cheaper.</div>
+  </div>
+</section>
+
+<!-- ========= PYDANTIC ========= -->
+<section id="pydantic">
+  <h2>🐍 Pydantic — from zero</h2>
+  <p class="lead">Pydantic is a Python library for data validation using type hints. It turns "type hints are suggestions" into "type hints are runtime rules."</p>
+
+  <p>In plain Python, type hints are ignored at runtime. Pydantic flips this: it uses the same hints as <strong>runtime validation rules</strong>. Data that doesn't match raises <code>ValidationError</code>.</p>
+
+  <h3>The four superpowers</h3>
+  <div class="card-grid">
+    <div class="card"><h4>1. Validation</h4>
+      <p style="font-size:0.9rem;color:var(--text-dim)"><code>Model.model_validate(dict)</code> — turns a dict into a typed object or raises <code>ValidationError</code>.</p></div>
+    <div class="card"><h4>2. Coercion</h4>
+      <p style="font-size:0.9rem;color:var(--text-dim)"><code>{"age": "30"}</code> becomes <code>age=30</code> — smart conversion.</p></div>
+    <div class="card"><h4>3. Attribute access</h4>
+      <p style="font-size:0.9rem;color:var(--text-dim)"><code>obj.name</code> instead of <code>data["name"]</code>. Your IDE autocompletes.</p></div>
+    <div class="card"><h4>4. Serialization</h4>
+      <p style="font-size:0.9rem;color:var(--text-dim)"><code>model.model_dump()</code> — back to a plain dict for <code>json.dump</code>.</p></div>
+  </div>
+
+  <h3>The three methods you actually use</h3>
+  <pre><code><span class="tok-com"># 1. Parse — io_utils.py</span>
+fn = FunctionDef.model_validate({<span class="tok-str">"name"</span>: <span class="tok-str">"fn_add_numbers"</span>, ...})
+
+<span class="tok-com"># 2. Construct — __main__.py</span>
+call = FunctionCall(prompt=..., name=..., parameters=...)   <span class="tok-com"># validates too</span>
+
+<span class="tok-com"># 3. Serialize — io_utils.save_function_calls</span>
+data = [call.model_dump() <span class="tok-key">for</span> call <span class="tok-key">in</span> calls]
+json.dump(data, f, indent=<span class="tok-num">2</span>)</code></pre>
+
+  <p>⚠️ Old tutorials use <code>parse_obj</code> / <code>dict()</code> — those are Pydantic <strong>v1</strong>. You use <strong>v2</strong>: <code>model_validate</code> / <code>model_dump</code>.</p>
+
+  <div class="qa-item">
+    <button class="qa-q">Why does <code>LLM</code> not inherit from <code>BaseModel</code>?<span class="icon">+</span></button>
+    <div class="qa-a">All <strong>data classes</strong> use <code>BaseModel</code> per the subject. <code>LLM</code> and <code>Vocab</code> are not data classes — they're behavior wrappers (the SDK firewall and the vocab cache). Pydantic doesn't apply to those.</div>
+  </div>
+</section>
+
+<!-- ========= THE CODE ========= -->
+<section id="files">
+  <h2>📁 The Code — file by file</h2>
+  <p class="lead">Click each tab to walk through that file in plain English. Every line, why it's there, and the defense-ready answer if probed.</p>
+
+  <div class="tabs" role="tablist">
+    <button class="tab active" data-tab="t-models">models.py</button>
+    <button class="tab" data-tab="t-io">io_utils.py</button>
+    <button class="tab" data-tab="t-main">__main__.py</button>
+    <button class="tab" data-tab="t-llm">llm_runner.py</button>
+  </div>
+
+  <div id="t-models" class="tab-content active">
+    <h3>models.py — the contract</h3>
+    <p>Declares four Pydantic shape templates so the rest of the code receives <strong>typed, validated</strong> data instead of raw dicts.</p>
+    <pre><code><span class="tok-key">from</span> typing <span class="tok-key">import</span> Any, Literal
+<span class="tok-key">from</span> pydantic <span class="tok-key">import</span> BaseModel
+
+ParamType = Literal[<span class="tok-str">"number"</span>, <span class="tok-str">"integer"</span>, <span class="tok-str">"string"</span>,
+                    <span class="tok-str">"boolean"</span>, <span class="tok-str">"array"</span>, <span class="tok-str">"object"</span>]
+
+<span class="tok-key">class</span> <span class="tok-fn">TypeSpec</span>(BaseModel):
+    type: ParamType
+
+<span class="tok-key">class</span> <span class="tok-fn">FunctionDef</span>(BaseModel):
+    name: <span class="tok-fn">str</span>
+    description: <span class="tok-fn">str</span>
+    parameters: <span class="tok-fn">dict</span>[<span class="tok-fn">str</span>, TypeSpec]
+    returns: TypeSpec
+
+<span class="tok-key">class</span> <span class="tok-fn">TestPrompt</span>(BaseModel):
+    prompt: <span class="tok-fn">str</span>
+
+<span class="tok-key">class</span> <span class="tok-fn">FunctionCall</span>(BaseModel):
+    prompt: <span class="tok-fn">str</span>
+    name: <span class="tok-fn">str</span>
+    parameters: <span class="tok-fn">dict</span>[<span class="tok-fn">str</span>, Any]</code></pre>
+
+    <h4>What to remember</h4>
+    <ul style="padding-left:24px;color:var(--text-dim)">
+      <li><code>Literal[...]</code> whitelists exactly those six strings — better than <code>str</code> (which would accept <code>"wibble"</code>).</li>
+      <li><code>FunctionDef.parameters</code> is <code>dict[str, TypeSpec]</code> → declared <em>types</em>.</li>
+      <li><code>FunctionCall.parameters</code> is <code>dict[str, Any]</code> → actual <em>values</em>.</li>
+      <li>Pydantic validates nested models <strong>recursively</strong>.</li>
+    </ul>
+  </div>
+
+  <div id="t-io" class="tab-content">
+    <h3>io_utils.py — disk + JSON bridge</h3>
+    <p>Three functions. Two read (one per input file), one writes. Every reader runs the same defensive pattern: <strong>exists → parse → shape-check → schema-validate</strong>, translating four failure modes into two clean exceptions.</p>
+    <pre><code><span class="tok-key">def</span> <span class="tok-fn">load_function_definitions</span>(path: Path) -> <span class="tok-fn">list</span>[FunctionDef]:
+    <span class="tok-key">if not</span> path.exists():
+        <span class="tok-key">raise</span> <span class="tok-fn">FileNotFoundError</span>(<span class="tok-str">f"Function definitions file not found: {path}"</span>)
+
+    <span class="tok-key">try</span>:
+        <span class="tok-key">with</span> path.open(<span class="tok-str">"r"</span>, encoding=<span class="tok-str">"utf-8"</span>) <span class="tok-key">as</span> f:
+            raw = json.load(f)
+    <span class="tok-key">except</span> json.JSONDecodeError <span class="tok-key">as</span> e:
+        <span class="tok-key">raise</span> <span class="tok-fn">ValueError</span>(<span class="tok-str">f"Invalid JSON in {path}: {e}"</span>) <span class="tok-key">from</span> e
+
+    <span class="tok-key">if not</span> <span class="tok-fn">isinstance</span>(raw, <span class="tok-fn">list</span>):
+        <span class="tok-key">raise</span> <span class="tok-fn">ValueError</span>(<span class="tok-str">f"{path} must contain a JSON array..."</span>)
+
+    <span class="tok-key">try</span>:
+        <span class="tok-key">return</span> [FunctionDef.model_validate(item) <span class="tok-key">for</span> item <span class="tok-key">in</span> raw]
+    <span class="tok-key">except</span> ValidationError <span class="tok-key">as</span> e:
+        <span class="tok-key">raise</span> <span class="tok-fn">ValueError</span>(<span class="tok-str">f"Schema error in {path}:\n{e}"</span>) <span class="tok-key">from</span> e</code></pre>
+
+    <h4>Key ideas</h4>
+    <ul style="padding-left:24px;color:var(--text-dim)">
+      <li><code>with</code> = context manager. Guarantees file close even on exception. Subject mandates this.</li>
+      <li><code>raise ... from e</code> = exception chaining. Translate types without losing debug info.</li>
+      <li>Only <strong>two</strong> exception types come out: <code>FileNotFoundError</code> or <code>ValueError</code>. <code>__main__.py</code> catches both in one line.</li>
+      <li><code>save_function_calls</code> uses <code>path.parent.mkdir(parents=True, exist_ok=True)</code> — like <code>mkdir -p</code>, never crashes if dir exists.</li>
+    </ul>
+  </div>
+
+  <div id="t-main" class="tab-content">
+    <h3>__main__.py — the CLI &amp; main loop</h3>
+    <p>The entry point. Parses CLI args, loads inputs (the only <code>try</code> in the project), builds the LLM + vocab cache, loops over prompts, writes output.</p>
+    <pre><code><span class="tok-key">def</span> <span class="tok-fn">main</span>() -> <span class="tok-fn">int</span>:
+    args = parse_args()
+
+    <span class="tok-key">try</span>:
+        functions = load_function_definitions(args.functions_definition)
+        prompts   = load_test_prompts(args.input)
+    <span class="tok-key">except</span> (<span class="tok-fn">FileNotFoundError</span>, <span class="tok-fn">ValueError</span>) <span class="tok-key">as</span> e:
+        <span class="tok-fn">print</span>(<span class="tok-str">f"[error] {e}"</span>, file=sys.stderr)
+        <span class="tok-key">return</span> <span class="tok-num">1</span>
+
+    llm   = LLM()
+    vocab = Vocab(llm)
+
+    results: <span class="tok-fn">list</span>[FunctionCall] = []
+    <span class="tok-key">for</span> i, p <span class="tok-key">in</span> <span class="tok-fn">enumerate</span>(prompts, <span class="tok-num">1</span>):
+        chosen = pick_best_function(llm, p.prompt, functions)
+        params = fill_parameters(llm, vocab, p.prompt, chosen)
+        call   = FunctionCall(prompt=p.prompt, name=chosen.name,
+                              parameters=params)        <span class="tok-com"># 3rd Pydantic check</span>
+        results.append(call)
+
+    save_function_calls(args.output, results)
+    <span class="tok-key">return</span> <span class="tok-num">0</span>
+
+<span class="tok-key">if</span> __name__ == <span class="tok-str">"__main__"</span>:
+    sys.exit(main())</code></pre>
+
+    <h4>Things to know</h4>
+    <ul style="padding-left:24px;color:var(--text-dim)">
+      <li>The <code>try</code> here is the <strong>only</strong> one in the whole project. Clean error model.</li>
+      <li>Errors print to <code>stderr</code> (not stdout) — convention.</li>
+      <li>Building <code>FunctionCall(...)</code> validates a <strong>third</strong> time (in addition to the two in <code>io_utils</code>).</li>
+      <li>The <code>if __name__ == "__main__"</code> guard is the standard Python entry idiom.</li>
+    </ul>
+  </div>
+
+  <div id="t-llm" class="tab-content">
+    <h3>llm_runner.py — the heart</h3>
+    <p>Holds everything interesting: the LLM wrapper (forbidden-import firewall), the vocab cache, and the constrained-decoding logic for stage 1 (function selection) and stage 2 (per-type generation).</p>
+
+    <h4>Math helpers</h4>
+    <pre><code><span class="tok-key">def</span> <span class="tok-fn">_logsumexp</span>(values: <span class="tok-fn">list</span>[<span class="tok-fn">float</span>]) -> <span class="tok-fn">float</span>:
+    m = <span class="tok-fn">max</span>(values)
+    <span class="tok-key">return</span> m + math.log(<span class="tok-fn">sum</span>(math.exp(v - m) <span class="tok-key">for</span> v <span class="tok-key">in</span> values))
+
+<span class="tok-key">def</span> <span class="tok-fn">_argmax_in</span>(logits: <span class="tok-fn">list</span>[<span class="tok-fn">float</span>], allowed: <span class="tok-fn">set</span>[<span class="tok-fn">int</span>]) -> <span class="tok-fn">int</span> | <span class="tok-fn">None</span>:
+    best_id, best_score = <span class="tok-fn">None</span>, <span class="tok-fn">float</span>(<span class="tok-str">"-inf"</span>)
+    <span class="tok-key">for</span> tok <span class="tok-key">in</span> allowed:
+        <span class="tok-key">if</span> logits[tok] > best_score:
+            best_score, best_id = logits[tok], tok
+    <span class="tok-key">return</span> best_id</code></pre>
+    <p style="color:var(--text-dim);font-size:0.92rem"><code>_logsumexp</code> = stable Concept 7. <code>_argmax_in</code> = the masking primitive (Concept 8): equivalent to setting outside logits to −∞ and taking argmax, but cheaper.</p>
+
+    <h4>The LLM wrapper</h4>
+    <pre><code><span class="tok-key">class</span> <span class="tok-fn">LLM</span>:
+    <span class="tok-key">def</span> <span class="tok-fn">__init__</span>(self, model_name=<span class="tok-str">"Qwen/Qwen3-0.6B"</span>):
+        self._sdk = Small_LLM_Model(model_name=model_name)
+
+    <span class="tok-key">def</span> <span class="tok-fn">encode</span>(self, text):       <span class="tok-key">return</span> self._sdk.encode(text).tolist()[<span class="tok-num">0</span>]
+    <span class="tok-key">def</span> <span class="tok-fn">decode</span>(self, ids):         <span class="tok-key">return</span> self._sdk.decode(ids)
+    <span class="tok-key">def</span> <span class="tok-fn">logits_after</span>(self, ids):   <span class="tok-key">return</span> self._sdk.get_logits_from_input_ids(ids)
+    <span class="tok-key">def</span> <span class="tok-fn">vocab_size</span>(self):
+        <span class="tok-key">return</span> <span class="tok-fn">len</span>(self.logits_after([<span class="tok-num">0</span>]))     <span class="tok-com"># logits length = vocab size</span></code></pre>
+    <p style="color:var(--text-dim);font-size:0.92rem"><strong>Why this exists:</strong> subject forbids <code>torch</code> / <code>transformers</code>. SDK uses both. This class converts every SDK call to plain Python types so the rest of the code never sees a tensor.</p>
+
+    <h4>The Vocab cache</h4>
+    <pre><code><span class="tok-key">class</span> <span class="tok-fn">Vocab</span>:
+    <span class="tok-key">def</span> <span class="tok-fn">__init__</span>(self, llm):
+        self.size = llm.vocab_size()
+        self.id_to_text = {i: llm.decode([i]) <span class="tok-key">for</span> i <span class="tok-key">in</span> <span class="tok-fn">range</span>(self.size)}
+
+    <span class="tok-key">def</span> <span class="tok-fn">tokens_where</span>(self, predicate):
+        <span class="tok-key">return</span> {i <span class="tok-key">for</span> i, txt <span class="tok-key">in</span> self.id_to_text.items() <span class="tok-key">if</span> predicate(txt)}</code></pre>
+    <p style="color:var(--text-dim);font-size:0.92rem">Decode 152k tokens once at startup (~10s). Then filtering by predicate (e.g. "all numeric tokens") is a fast set comprehension.</p>
+
+    <h4>Stage 1 — function selection</h4>
+    <p>Encode the selection prompt, ask for next-token logits once, rank candidates by their first-token logit. If candidates share a first token (which happens with the <code>fn_</code> prefix), fall back to full sum-of-log-probs scoring via <code>score_candidate</code>.</p>
+
+    <h4>Stage 2 — per-type generators</h4>
+    <ul style="padding-left:24px;color:var(--text-dim)">
+      <li><code>generate_number</code> — allows only digit/<code>.</code>/<code>-</code> tokens; stops when the unconstrained top is non-numeric.</li>
+      <li><code>generate_string</code> — Stage A: allow any non-empty token, stop on newline. Stage B (fallback): force substring of user prompt.</li>
+      <li><code>generate_boolean</code> — score <code>"true"</code> vs <code>"false"</code> with <code>score_candidate</code>, pick higher.</li>
+    </ul>
+
+    <h4>The dispatcher</h4>
+    <pre><code><span class="tok-key">def</span> <span class="tok-fn">fill_parameters</span>(llm, vocab, user_prompt, fn_def):
+    result = {}
+    defaults = {<span class="tok-str">"integer"</span>: <span class="tok-num">0</span>, <span class="tok-str">"number"</span>: <span class="tok-num">0.0</span>, <span class="tok-str">"boolean"</span>: <span class="tok-fn">False</span>}
+    <span class="tok-key">for</span> param_name, type_spec <span class="tok-key">in</span> fn_def.parameters.items():
+        prompt  = build_param_prompt(user_prompt, fn_def, param_name, result)
+        context = llm.encode(prompt)
+        <span class="tok-key">try</span>:
+            <span class="tok-key">if</span> type_spec.type == <span class="tok-str">"number"</span>:
+                result[param_name] = generate_number(llm, vocab, context)
+            <span class="tok-key">elif</span> type_spec.type == <span class="tok-str">"integer"</span>:
+                result[param_name] = generate_number(llm, vocab, context, is_integer=<span class="tok-fn">True</span>)
+            <span class="tok-key">elif</span> type_spec.type == <span class="tok-str">"boolean"</span>:
+                result[param_name] = generate_boolean(llm, context)
+            <span class="tok-key">else</span>:
+                result[param_name] = generate_string(llm, vocab, context, user_prompt)
+        <span class="tok-key">except</span> <span class="tok-fn">ValueError</span>:
+            result[param_name] = defaults.get(type_spec.type, <span class="tok-str">""</span>)
+    <span class="tok-key">return</span> result</code></pre>
+    <p style="color:var(--text-dim);font-size:0.92rem"><strong>Never-crash guarantee:</strong> if <code>generate_number</code> raises, the typed default keeps the output JSON valid.</p>
+  </div>
+</section>
+
+<!-- ========= INTERACTIVE DEMO ========= -->
+<section id="demo">
+  <h2>🎮 Interactive Demo — masking with −∞</h2>
+  <p class="lead">Click a token chip below to toggle it between <strong>allowed</strong> and <strong>forbidden</strong>. The bar chart shows the live argmax winner. This is exactly what <code>_argmax_in(logits, allowed)</code> does in your code.</p>
+
+  <div class="demo">
+    <h4>Pretend vocabulary (6 tokens)</h4>
+    <div class="tok-row" id="tokRow"></div>
+    <div id="logitBars"></div>
+    <p style="color:var(--text-dim);font-size:0.92rem;margin-top:12px">
+      Hint: forbid the token with the highest score, and a different one wins. Mask all but one — that one wins by default.
+    </p>
+    <button class="btn secondary" onclick="resetDemo()">Reset</button>
+    <button class="btn" onclick="onlyNumbers()">Allow only numbers (like generate_number)</button>
+  </div>
+
+  <div class="demo">
+    <h4>Generation loop — one step at a time</h4>
+    <p style="color:var(--text-dim);font-size:0.92rem">Watch the prefix grow as the loop adds the constrained-argmax winner each step.</p>
+    <pre id="genOutput" style="min-height:60px"><span class="tok-com"># Press "Step" to advance</span>
+prefix = "a = "</pre>
+    <button class="btn" onclick="genStep()">▶ Step</button>
+    <button class="btn secondary" onclick="genReset()">Reset</button>
+    <div id="genTrace" style="color:var(--text-dim);font-size:0.9rem;margin-top:12px"></div>
+  </div>
+</section>
+
+<!-- ========= RISKS ========= -->
+<section id="risks">
+  <h2>⚠️ Three honest risks to know</h2>
+  <p class="lead">Old documentation contained over-confident claims. Knowing the truth makes you sound mature — not weaker.</p>
+
+  <div class="risk">
+    <h4>1. The "first-token speedup" may not fire on your data</h4>
+    <p>Old README claimed "no collisions, exact, 15× speedup." But all your function names start with <code>fn_</code>, so they likely <strong>share the same first token</strong> → the tie-breaker (full scoring) runs every time.</p>
+    <p><strong>Defense answer:</strong> "My picker reads next-token logits once and ranks by first-token logit. When candidates share a first token, I fall back to sum-of-log-probs. In my test data, all names start with <code>fn_</code> so the tie-breaker runs every time. The optimisation is general; correctness is preserved either way."</p>
+  </div>
+
+  <div class="risk">
+    <h4>2. Stage A string generation isn't strongly content-constrained</h4>
+    <p>Old DEFENSE claimed "the model can never write a <code>}</code>." That's only true for Stage B (the substring fallback). Stage A allows any non-empty token; it just stops on a newline.</p>
+    <p><strong>Defense answer:</strong> "Strings can't be enumerated like digits, so my constraint is the <em>boundary</em>, not the content. Stage A allows any non-empty content token and stops on newline. JSON validity is guaranteed by <code>json.dump</code>, not by the model — the model only supplies the string value."</p>
+  </div>
+
+  <div class="risk">
+    <h4>3. <code>numpy</code> is declared but unused</h4>
+    <p>It's in <code>pyproject.toml</code> but never imported.</p>
+    <p><strong>Defense answer:</strong> "Allowed by the subject; declared for potential extension. The current algorithm uses plain Python lists, which are fast enough."</p>
+  </div>
+</section>
+
+<!-- ========= Q&A BANK ========= -->
+<section id="qa">
+  <h2>🎤 Q&amp;A Bank</h2>
+  <p class="lead">Click any question to reveal the polished answer. These are the most likely evaluator questions.</p>
+
+  <h3>Math &amp; concepts</h3>
+  <div class="qa-item"><button class="qa-q">What is a logit?<span class="icon">+</span></button>
+    <div class="qa-a">A raw, unnormalized score the model assigns to each vocabulary token as a candidate for the next position. Not a probability; typically −15 to +25; higher = more plausible.</div></div>
+  <div class="qa-item"><button class="qa-q">What is softmax for?<span class="icon">+</span></button>
+    <div class="qa-a">To turn logits into probabilities in [0,1] that sum to 1. I don't compute it because it preserves ordering — argmax on raw logits picks the same token.</div></div>
+  <div class="qa-item"><button class="qa-q">Why log-probabilities instead of probabilities?<span class="icon">+</span></button>
+    <div class="qa-a">Numerical stability: probabilities multiply and underflow to zero on long sequences; logs add.</div></div>
+  <div class="qa-item"><button class="qa-q">Why sum log-probs and not average them?<span class="icon">+</span></button>
+    <div class="qa-a">Sum equals <code>log P(whole sequence)</code> — the model's actual likelihood. Average biases toward long candidates whose late tokens are forced (high log-prob, near zero).</div></div>
+  <div class="qa-item"><button class="qa-q">Why sum log-probs and not raw logits?<span class="icon">+</span></button>
+    <div class="qa-a">Raw logits are unnormalized; summing them is biased toward long candidates (positive logits add up). Log-probs are normalized (≤ 0); summing is a legitimate probabilistic calculation.</div></div>
+  <div class="qa-item"><button class="qa-q">Why mask with −∞ and not 0?<span class="icon">+</span></button>
+    <div class="qa-a"><code>0</code> is a normal logit; many good tokens score near 0 — it wouldn't suppress an illegal token. <code>−∞</code> guarantees it can't win argmax, and after softmax its probability is <code>exp(−∞) = 0</code>.</div></div>
+  <div class="qa-item"><button class="qa-q">Why subtract <code>max(values)</code> in <code>_logsumexp</code>?<span class="icon">+</span></button>
+    <div class="qa-a">Numerical stability. Without it, <code>exp</code> of a large logit can overflow. Subtracting a constant from every term and adding it back doesn't change the result.</div></div>
+
+  <h3>Constrained decoding</h3>
+  <div class="qa-item"><button class="qa-q">Where exactly is constrained decoding in your code?<span class="icon">+</span></button>
+    <div class="qa-a"><code>_argmax_in(logits, allowed)</code> is the primitive. Three uses: (1) function-name selection — <code>allowed = candidates' first tokens</code>; (2) <code>generate_number</code> — <code>allowed = digit/./-</code> tokens; (3) <code>generate_string</code> Stage B — <code>allowed = tokens keeping the value a substring of the user prompt</code>.</div></div>
+  <div class="qa-item"><button class="qa-q">How does <code>_argmax_in</code> actually mask?<span class="icon">+</span></button>
+    <div class="qa-a">It searches the maximum only among allowed IDs. Mathematically equivalent to setting other logits to −∞ and taking argmax, but cheaper because no 152k array is materialised.</div></div>
+  <div class="qa-item"><button class="qa-q">Why end string prompts with <code>'</code>?<span class="icon">+</span></button>
+    <div class="qa-a">Priming. The model has seen millions of <code>key = 'value'\n</code> patterns. Ending with <code>key = '</code> puts it in string-literal mode; its natural continuation is the value, a closing <code>'</code>, and a newline.</div></div>
+
+  <h3>Architecture</h3>
+  <div class="qa-item"><button class="qa-q">Why a <code>Vocab</code> cache?<span class="icon">+</span></button>
+    <div class="qa-a">We filter the vocabulary by predicate many times. Decoding 152k IDs once at startup costs ~10s; subsequent filters are fast set comprehensions.</div></div>
+  <div class="qa-item"><button class="qa-q">Why the <code>LLM</code> wrapper class?<span class="icon">+</span></button>
+    <div class="qa-a">Subject forbids <code>import torch</code> / <code>transformers</code>. The SDK uses them internally. The wrapper converts every SDK call to plain Python types so the rest of the code never sees a tensor.</div></div>
+  <div class="qa-item"><button class="qa-q">Why Pydantic?<span class="icon">+</span></button>
+    <div class="qa-a">Subject mandates it for data classes. It gives free schema validation at every JSON boundary, with clean <code>ValidationError</code>s.</div></div>
+  <div class="qa-item"><button class="qa-q">Why first-token scoring for the function picker?<span class="icon">+</span></button>
+    <div class="qa-a">Speed. Naive scoring of every candidate's full sequence costs n×~3 forward passes per prompt. First-token uses one. When first tokens collide — as they do with the <code>fn_</code> prefix in my data — the tie-breaker takes over. Correctness preserved.</div></div>
+
+  <h3>Error handling</h3>
+  <div class="qa-item"><button class="qa-q">What if the input file is missing?<span class="icon">+</span></button>
+    <div class="qa-a"><code>io_utils.load_function_definitions</code> raises <code>FileNotFoundError</code>; <code>__main__.py</code> catches, prints <code>[error] ...</code> to stderr, exits 1. No crash.</div></div>
+  <div class="qa-item"><button class="qa-q">What if the model can't produce a number?<span class="icon">+</span></button>
+    <div class="qa-a"><code>generate_number</code> raises <code>ValueError</code>. <code>fill_parameters</code> catches and falls back to a typed default (<code>0.0</code>, <code>0</code>, <code>False</code>, <code>""</code>) so we still write a valid <code>FunctionCall</code>.</div></div>
+  <div class="qa-item"><button class="qa-q">Where exactly does Pydantic validation run?<span class="icon">+</span></button>
+    <div class="qa-a">Three places: (1) <code>io_utils.load_function_definitions</code>; (2) <code>io_utils.load_test_prompts</code>; (3) <code>__main__.py</code> when constructing each <code>FunctionCall(...)</code>.</div></div>
+
+  <h3>Subject requirements</h3>
+  <div class="qa-item"><button class="qa-q">Where are your context managers?<span class="icon">+</span></button>
+    <div class="qa-a">Every file open uses <code>with path.open(...) as f:</code> — <code>io_utils.load_*</code> and <code>save_function_calls</code>.</div></div>
+  <div class="qa-item"><button class="qa-q">Where are your type hints / docstrings?<span class="icon">+</span></button>
+    <div class="qa-a">Every function has return + parameter types; every function and class has a PEP 257 docstring.</div></div>
+  <div class="qa-item"><button class="qa-q">Why no use of numpy?<span class="icon">+</span></button>
+    <div class="qa-a">It's allowed by the subject; declared for potential extension. The current algorithm uses plain Python lists, which are fast enough.</div></div>
+</section>
+
+<!-- ========= QUIZ ========= -->
+<section id="quiz">
+  <h2>🎯 Defense Quiz</h2>
+  <p class="lead">Twelve multiple-choice questions. Each one tests a defense-critical idea. After picking, the correct answer turns green, wrong ones red, and you get a one-sentence explanation.</p>
+
+  <div class="quiz-score">
+    Score: <span class="pct" id="scoreNum">0 / 0</span>
+    <div style="font-size:0.85rem;color:var(--text-dim);margin-top:4px" id="scoreNote">Answer questions to build your score</div>
+    <button class="btn secondary" onclick="resetQuiz()" style="margin-top:8px">Reset</button>
+  </div>
+
+  <div id="quizContainer"></div>
+</section>
+
+<!-- ========= CHECKLIST ========= -->
+<section id="checklist">
+  <h2>✅ Pre-defense checklist</h2>
+  <p class="lead">Click each item when you can do it confidently. Progress saves in your browser.</p>
+
+  <div class="checklist">
+    <div class="progress"><div class="fill" id="cklFill"></div></div>
+    <div id="cklContainer"></div>
+  </div>
+
+  <h3>One last thing to memorize — your 60-second elevator pitch</h3>
+  <div class="hero" style="margin-top:16px">
+    <p class="pitch" style="font-size:1rem">
+      <em>"The project takes a sentence like 'What is the sum of 2 and 3?' and produces a structured JSON
+      call: <code>{name: fn_add_numbers, parameters: {a: 2.0, b: 3.0}}</code>. The hard part is making this
+      reliable with a tiny 0.6B Qwen3 — asked nicely for JSON it succeeds only about 30% of the time. The
+      technique I use to push that to ~100% is <strong>constrained decoding</strong>: at every token step,
+      I look at the model's logits for all 152,000 vocab tokens and forbid any that would break the type
+      I expect. The pipeline is two stages — function selection by first-token logit with a
+      sum-of-log-probs tie-breaker, then per-parameter type-specific generation (digits-only for numbers,
+      boundary-on-newline for strings with a substring fallback, scored 'true' vs 'false' for booleans).
+      The JSON itself is built by Python with Pydantic and written with <code>json.dump</code> — never by
+      the model. That's why 100% valid JSON comes for free; constrained decoding makes the <strong>values</strong>
+      correct, not the braces."</em>
+    </p>
+  </div>
+</section>
+
+<div class="footer">
+  Built for luricci's Call Me Maybe defense · 42 Firenze · stay calm, you know this 🐺
+</div>
+
+</main>
+</div>
+
+<button class="mobile-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
+
+<script>
+/* ============ SIDEBAR ACTIVE STATE ============ */
+const sections = document.querySelectorAll('section');
+const navLinks = document.querySelectorAll('nav.sidebar a');
+window.addEventListener('scroll', () => {
+  let current = '';
+  sections.forEach(s => {
+    const top = s.offsetTop - 100;
+    if (window.scrollY >= top) current = s.id;
+  });
+  navLinks.forEach(a => {
+    a.classList.toggle('active', a.getAttribute('href') === '#' + current);
+  });
+});
+
+/* ============ TABS ============ */
+document.querySelectorAll('.tab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(btn.dataset.tab).classList.add('active');
+  });
+});
+
+/* ============ ACCORDION (Q&A) ============ */
+document.querySelectorAll('.qa-q').forEach(btn => {
+  btn.addEventListener('click', () => btn.parentElement.classList.toggle('open'));
+});
+
+/* ============ MASKING DEMO ============ */
+const tokens = [
+  { id: 0, text: '"2"',    logit: 7.5, numeric: true },
+  { id: 1, text: '"the"',  logit: 6.2, numeric: false },
+  { id: 2, text: '"and"',  logit: 4.8, numeric: false },
+  { id: 3, text: '"3"',    logit: 4.2, numeric: true },
+  { id: 4, text: '" "',    logit: 3.1, numeric: false },
+  { id: 5, text: '"hello"',logit: 1.5, numeric: false },
+];
+let allowed = new Set([0, 1, 2, 3, 4, 5]);
+
+function renderDemo() {
+  const row = document.getElementById('tokRow');
+  row.innerHTML = '';
+  tokens.forEach(t => {
+    const chip = document.createElement('div');
+    chip.className = 'tok-chip ' + (allowed.has(t.id) ? 'allowed' : 'forbidden');
+    chip.textContent = t.text + ' (id ' + t.id + ')';
+    chip.onclick = () => {
+      if (allowed.has(t.id)) allowed.delete(t.id); else allowed.add(t.id);
+      renderDemo();
+    };
+    row.appendChild(chip);
+  });
+  // Find winner
+  let winnerId = null, winnerScore = -Infinity;
+  allowed.forEach(id => {
+    const t = tokens.find(x => x.id === id);
+    if (t.logit > winnerScore) { winnerScore = t.logit; winnerId = id; }
+  });
+  // Re-render chips with winner highlight
+  if (winnerId !== null) {
+    row.children[winnerId].classList.add('winner');
+  }
+  // Bars
+  const bars = document.getElementById('logitBars');
+  bars.innerHTML = '';
+  const maxLogit = Math.max(...tokens.map(t => t.logit));
+  tokens.forEach(t => {
+    const row2 = document.createElement('div');
+    row2.className = 'logit-bar';
+    if (!allowed.has(t.id)) row2.classList.add('forbidden');
+    if (t.id === winnerId) row2.classList.add('winner');
+    row2.innerHTML =
+      '<div class="label">' + t.text + '</div>' +
+      '<div class="bar" style="width:' + (t.logit / maxLogit * 240) + 'px"></div>' +
+      '<div class="val">' + (allowed.has(t.id) ? t.logit.toFixed(1) : '−∞') + '</div>';
+    bars.appendChild(row2);
+  });
+}
+function resetDemo() { allowed = new Set([0,1,2,3,4,5]); renderDemo(); }
+function onlyNumbers() {
+  allowed = new Set(tokens.filter(t => t.numeric).map(t => t.id));
+  renderDemo();
+}
+renderDemo();
+
+/* ============ GENERATION-LOOP DEMO ============ */
+const genSteps = [
+  { tok: '"2"',  prefix: 'a = 2',  note: 'constrained: pick top NUMERIC token → "2"' },
+  { tok: '"3"',  prefix: 'a = 23', note: 'still in number mode → "3"' },
+  { tok: 'STOP', prefix: 'a = 23', note: 'unconstrained top = " and" (non-numeric) → STOP. Decode "23" → int(float("23")) = 23' },
+];
+let stepIdx = 0;
+function genStep() {
+  if (stepIdx >= genSteps.length) return;
+  const s = genSteps[stepIdx];
+  document.getElementById('genOutput').textContent = 'prefix = "' + s.prefix + '"';
+  const trace = document.getElementById('genTrace');
+  trace.innerHTML += '<div>Step ' + (stepIdx + 1) + ': ' + s.note + '</div>';
+  stepIdx++;
+  if (stepIdx >= genSteps.length) {
+    trace.innerHTML += '<div style="color:var(--green);margin-top:8px">✅ generate_number returned <code>23</code></div>';
+  }
+}
+function genReset() {
+  stepIdx = 0;
+  document.getElementById('genOutput').textContent = '# Press "Step" to advance\nprefix = "a = "';
+  document.getElementById('genTrace').innerHTML = '';
+}
+
+/* ============ QUIZ ============ */
+const quizData = [
+  {
+    q: "What is a logit?",
+    opts: [
+      "A probability between 0 and 1",
+      "A raw unnormalized score the model assigns to each vocabulary token",
+      "An integer token ID",
+      "A type of activation function"
+    ],
+    correct: 1,
+    explain: "A logit is a raw, unnormalized score — typically between −15 and +25. NOT a probability."
+  },
+  {
+    q: "Why do we use argmax instead of just max?",
+    opts: [
+      "Argmax is faster",
+      "max returns the value; argmax returns the index (which IS the token ID)",
+      "They are the same thing in Python",
+      "Because softmax requires it"
+    ],
+    correct: 1,
+    explain: "We need to know WHICH token to use next — the index IS the token ID. The score itself is useless."
+  },
+  {
+    q: "Why don't we apply softmax in our code?",
+    opts: [
+      "Softmax is too slow on 152k tokens",
+      "It would break the masking",
+      "It preserves ordering, so argmax on raw logits picks the same token",
+      "Pydantic doesn't support floats"
+    ],
+    correct: 2,
+    explain: "Softmax is monotone — it doesn't change the ranking. argmax(logits) == argmax(softmax(logits))."
+  },
+  {
+    q: "Why mask illegal tokens with −∞ instead of 0?",
+    opts: [
+      "−∞ is faster to compute",
+      "0 is a normal logit value; many good tokens score near 0, so 0 wouldn't suppress an illegal token",
+      "Because Python's float can't represent negative numbers",
+      "0 means 'undefined' to the LLM"
+    ],
+    correct: 1,
+    explain: "Setting an illegal token's logit to 0 might still let it win argmax. −∞ guarantees it can't, and exp(−∞)=0."
+  },
+  {
+    q: "Why sum log-probabilities to score a candidate sequence?",
+    opts: [
+      "Logs are easier for the model to handle",
+      "Sum of log-probs = log of product of probs = log P(sequence). Maximising it = maximising likelihood.",
+      "It's a Pydantic convention",
+      "Because numpy is faster on logs"
+    ],
+    correct: 1,
+    explain: "Probabilities multiply across a sequence; logs turn that into a sum that doesn't underflow."
+  },
+  {
+    q: "Why does _logsumexp subtract max(values) before applying exp?",
+    opts: [
+      "To save memory",
+      "To make negative logits positive",
+      "Numerical stability — without it, exp of a large logit overflows",
+      "It's a Pydantic requirement"
+    ],
+    correct: 2,
+    explain: "Subtracting a constant from every term doesn't change the result, but keeps exp ≤ 1."
+  },
+  {
+    q: "Where is constrained decoding actually applied in your code?",
+    opts: [
+      "Only in generate_number",
+      "Only inside Pydantic validators",
+      "Three places: function selection, number generation, string Stage B",
+      "Everywhere automatically"
+    ],
+    correct: 2,
+    explain: "Three places. The primitive is _argmax_in. The 'allowed' set is what changes."
+  },
+  {
+    q: "Why does build_param_prompt end string prompts with `name = '` (open quote)?",
+    opts: [
+      "Pydantic requires it",
+      "Priming — the model has seen millions of `key = 'value'` patterns; this puts it in string-literal mode",
+      "To escape special characters",
+      "It's the only way the SDK accepts strings"
+    ],
+    correct: 1,
+    explain: "Priming exploits the model's training distribution without imposing instructions a 0.6B model would ignore."
+  },
+  {
+    q: "Why does the LLM wrapper class exist?",
+    opts: [
+      "Pydantic mandates it",
+      "Subject forbids torch/transformers; the wrapper isolates SDK calls so the rest of the code never sees a tensor",
+      "It speeds up the model",
+      "It's required by uv"
+    ],
+    correct: 1,
+    explain: "It's the firewall. Every SDK call goes through it; outputs become plain Python lists."
+  },
+  {
+    q: "Where does Pydantic validation actually fire in your project?",
+    opts: [
+      "Only in models.py",
+      "Three places: load_function_definitions, load_test_prompts, and constructing FunctionCall(...) in __main__",
+      "Just once, when the program starts",
+      "Inside the LLM forward pass"
+    ],
+    correct: 1,
+    explain: "models.py only DEFINES the shapes. Validation fires when model_validate runs in io_utils, AND when FunctionCall(...) is constructed in __main__."
+  },
+  {
+    q: "What guarantees 100% valid JSON output?",
+    opts: [
+      "The model never makes mistakes thanks to constrained decoding",
+      "Pydantic forbids invalid JSON",
+      "Python builds a dict and calls json.dump — the model never writes braces",
+      "The Makefile lint target"
+    ],
+    correct: 2,
+    explain: "THE most important insight. The braces are Python's. Constrained decoding makes the VALUES correctly typed."
+  },
+  {
+    q: "Why does fill_parameters wrap each generator in try/except ValueError?",
+    opts: [
+      "Pydantic requires it",
+      "Never-crash guarantee: if a generator fails on an edge case, a typed default keeps the FunctionCall valid",
+      "To improve speed",
+      "It's redundant; the code would work without it"
+    ],
+    correct: 1,
+    explain: "Subject says 'must never crash.' Fallback to 0/0.0/False/'' keeps the output schema-valid."
+  }
+];
+
+const container = document.getElementById('quizContainer');
+let answered = 0, correct = 0;
+quizData.forEach((q, idx) => {
+  const card = document.createElement('div');
+  card.className = 'quiz-card';
+  card.innerHTML = '<div class="quiz-q"><span class="num">Q' + (idx+1) + '.</span>' + q.q + '</div>' +
+    q.opts.map((o, j) => '<button class="quiz-opt" data-q="' + idx + '" data-o="' + j + '">' + o + '</button>').join('') +
+    '<div class="quiz-explain"><strong>Why:</strong> ' + q.explain + '</div>';
+  container.appendChild(card);
+});
+function updateScore() {
+  const pct = answered ? Math.round(correct / answered * 100) : 0;
+  document.getElementById('scoreNum').textContent = correct + ' / ' + answered + ' (' + pct + '%)';
+  let note = "Answer questions to build your score";
+  if (answered && answered === quizData.length) {
+    if (pct === 100) note = "🎉 Perfect — you're ready.";
+    else if (pct >= 80) note = "💪 Strong. Review the wrong ones.";
+    else if (pct >= 60) note = "🟡 Decent. Go back to the concepts.";
+    else note = "📚 Re-read the 8 concepts and try again.";
+  } else if (answered) {
+    note = (quizData.length - answered) + " left";
+  }
+  document.getElementById('scoreNote').textContent = note;
+}
+document.querySelectorAll('.quiz-opt').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const qIdx = parseInt(btn.dataset.q), oIdx = parseInt(btn.dataset.o);
+    const card = btn.parentElement;
+    if (card.dataset.answered) return;
+    card.dataset.answered = "1";
+    const q = quizData[qIdx];
+    answered++;
+    const opts = card.querySelectorAll('.quiz-opt');
+    opts.forEach((o, j) => {
+      o.disabled = true;
+      if (j === q.correct) o.classList.add(j === oIdx ? 'correct' : 'reveal-correct');
+      else if (j === oIdx) o.classList.add('wrong');
+    });
+    if (oIdx === q.correct) correct++;
+    card.querySelector('.quiz-explain').classList.add('show');
+    updateScore();
+  });
+});
+function resetQuiz() {
+  answered = 0; correct = 0;
+  document.querySelectorAll('.quiz-card').forEach(card => {
+    delete card.dataset.answered;
+    card.querySelectorAll('.quiz-opt').forEach(o => {
+      o.disabled = false;
+      o.classList.remove('correct', 'wrong', 'reveal-correct');
+    });
+    card.querySelector('.quiz-explain').classList.remove('show');
+  });
+  updateScore();
+}
+updateScore();
+
+/* ============ CHECKLIST (with localStorage) ============ */
+const checklist = [
+  "I can define logit, softmax, log-prob, and −∞ masking in one sentence each",
+  "I can point at _argmax_in and explain it = argmax over the allowed set = masking the rest with −∞",
+  "I can name the three places constrained decoding fires (function selection, number gen, string Stage B)",
+  "I can explain why SUM of log-probs (not sum of logits, not mean of log-probs) is the right scoring rule",
+  "I can walk one prompt end-to-end (the 60-second pitch)",
+  "I know the three honest risks and can talk about them maturely",
+  "I know how to run: uv sync, make run, make lint, make clean",
+  "I know where Pydantic validates (3 places)",
+  "I know where every file open uses `with`",
+  "I can answer 'what if the input is missing?' without hesitation",
+  "I have actually run the program on my machine and verified the output JSON",
+  "I have updated the README accuracy numbers to match what I actually got"
+];
+const cklContainer = document.getElementById('cklContainer');
+const storeKey = 'cmm_ckl';
+let done = JSON.parse(localStorage.getItem(storeKey) || '{}');
+function renderCkl() {
+  cklContainer.innerHTML = '';
+  checklist.forEach((text, i) => {
+    const d = document.createElement('div');
+    d.className = 'item' + (done[i] ? ' done' : '');
+    d.innerHTML = '<div class="box"></div><div class="text">' + text + '</div>';
+    d.onclick = () => {
+      done[i] = !done[i];
+      localStorage.setItem(storeKey, JSON.stringify(done));
+      renderCkl();
+    };
+    cklContainer.appendChild(d);
+  });
+  const total = checklist.length;
+  const doneCount = Object.values(done).filter(Boolean).length;
+  document.getElementById('cklFill').style.width = (doneCount / total * 100) + '%';
+}
+renderCkl();
+</script>
+
+</body>
+</html>
